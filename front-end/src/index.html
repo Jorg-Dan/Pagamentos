@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout de Pagamento</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Finalizar Pagamento</h2>
+        
+        <div class="bg-gray-50 p-4 rounded mb-6 border border-gray-200">
+            <p class="text-sm text-gray-600">Pedido <span class="font-bold text-gray-800">#10293</span></p>
+            <p class="text-lg font-bold text-green-600 mt-1">Total: R$ 250,00</p>
+        </div>
+
+        <form id="paymentForm" onsubmit="processarPagamento(event)">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Método de Pagamento</label>
+                <select id="method_type" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="toggleMetodoPagamento()">
+                    <option value="CREDIT_CARD">Cartão de Crédito</option>
+                    <option value="DEBIT_CARD">Cartão de Débito</option>
+                    <option value="PIX">PIX</option>
+                    <option value="BOLETO">Boleto Bancário</option>
+                </select>
+            </div>
+
+            <div id="cartao_section" class="space-y-4 transition-all">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Número do Cartão</label>
+                    <input type="text" id="card_number" placeholder="0000 0000 0000 0000" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="19">
+                </div>
+                
+                <div class="flex gap-4">
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Validade</label>
+                        <input type="text" placeholder="MM/AA" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="5">
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                        <input type="text" placeholder="123" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="4">
+                    </div>
+                </div>
+
+                <div id="installments_section">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Parcelas</label>
+                    <select id="installments" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="1">1x de R$ 250,00 sem juros</option>
+                        <option value="2">2x de R$ 125,00 sem juros</option>
+                        <option value="3">3x de R$ 83,33 sem juros</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="pix_section" class="hidden text-center p-4 bg-blue-50 rounded border border-blue-100">
+                <p class="text-sm text-gray-700 mb-2">O QR Code será gerado na próxima tela.</p>
+                <p class="text-xs text-gray-500">Aprovação instantânea.</p>
+            </div>
+
+            <div id="boleto_section" class="hidden text-center p-4 bg-yellow-50 rounded border border-yellow-100">
+                <p class="text-sm text-gray-700">O boleto será gerado e enviado para o seu e-mail.</p>
+                <p class="text-xs text-gray-500 mt-1">Vencimento em 3 dias úteis.</p>
+            </div>
+
+            <button type="submit" class="w-full mt-6 bg-blue-600 text-white font-bold py-3 px-4 rounded hover:bg-blue-700 transition duration-200">
+                Confirmar Pagamento
+            </button>
+        </form>
+    </div>
+
+    <script>
+        function toggleMetodoPagamento() {
+            const method = document.getElementById('method_type').value;
+            const cartaoSection = document.getElementById('cartao_section');
+            const pixSection = document.getElementById('pix_section');
+            const boletoSection = document.getElementById('boleto_section');
+            const installmentsSection = document.getElementById('installments_section');
+
+            // Esconde tudo primeiro
+            cartaoSection.classList.add('hidden');
+            pixSection.classList.add('hidden');
+            boletoSection.classList.add('hidden');
+
+            // Mostra baseado na seleção
+            if (method === 'CREDIT_CARD' || method === 'DEBIT_CARD') {
+                cartaoSection.classList.remove('hidden');
+                // Mostra parcelas só se for crédito
+                if (method === 'CREDIT_CARD') {
+                    installmentsSection.classList.remove('hidden');
+                } else {
+                    installmentsSection.classList.add('hidden');
+                }
+            } else if (method === 'PIX') {
+                pixSection.classList.remove('hidden');
+            } else if (method === 'BOLETO') {
+                boletoSection.classList.remove('hidden');
+            }
+        }
+
+        function processarPagamento(event) {
+            event.preventDefault(); // Evita o recarregamento da página
+            const method = document.getElementById('method_type').value;
+            
+            // Aqui entraria a integração com o backend (ex: fetch('/api/pagamentos'))
+            alert('Processando pagamento via ' + method + '...\n\nNo mundo real, isso enviaria os dados para criar o registro nas tabelas "pagamento" e "transacao".');
+        }
+    </script>
+</body>
+</html>
