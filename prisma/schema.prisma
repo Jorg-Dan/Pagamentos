@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Pagamento {
+  id           Int      @id @default(autoincrement()) @db.UnsignedInt
+  order_id     Int      @db.UnsignedInt
+  customer_id  Int      @db.UnsignedInt
+  total_amount Decimal  @db.Decimal(10, 2)
+  status       Status   @default(PENDING)
+  created_at   DateTime @default(now()) @db.DateTime
+
+  metodos    MetodoPagamento[]
+  cartoes    Cartao[]
+  transacoes Transacao[]
+
+  @@map("pagamento")
+}
+
+model MetodoPagamento {
+  id           Int        @id @default(autoincrement()) @db.UnsignedInt
+  pagamento_id Int        @db.UnsignedInt
+  method_type  MethodType
+  is_instant   Int        @default(0) @db.TinyInt(1)
+  
+  pagamento    Pagamento  @relation(fields: [pagamento_id], references: [id], onDelete: Cascade)
+
+  @@map("metodo_pagamento")
+}
+
+model Cartao {
+  token            String    @id @db.VarChar(255)
+  last_four_digits String    @db.VarChar(4)
+  brand            String    @db.VarChar(50)
+  installments     Int       @default(1) @db.UnsignedTinyInt
+  pagamento_id     Int?      @db.UnsignedInt
+  
+  pagamento        Pagamento? @relation(fields: [pagamento_id], references: [id], onDelete: SetNull)
+
+  @@map("cartao")
+}
+
+model Transacao {
+  id               Int      @id @default(autoincrement()) @db.UnsignedInt
+  payment_id       Int      @db.UnsignedInt
+  external_id      String?  @db.VarChar(255)
+  amount           Decimal  @db.Decimal(10, 2)
+  type             TransType
+  status           TransStatus @default(PENDING)
+  gateway_response String?  @db.Text
+
+  pagamento        Pagamento @relation(fields: [payment_id], references: [id], onDelete: Cascade)
+
+  @@map("transacao")
+}
+
+enum Status { PENDING; PAID; CANCELLED; REFUNDED }
+enum MethodType { PIX; CREDIT_CARD; DEBIT_CARD; BOLETO }
+enum TransType { DEBIT; CREDIT; REFUND; CHARGEBACK }
+enum TransStatus { PENDING; COMPLETED; FAILED }
