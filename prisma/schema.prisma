@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Pagamento ─────────────────────────────────────────────────────────────────
+model Pagamento {
+  id         String          @id @default(uuid()) @db.VarChar(36)
+  pedido_id  String          @db.VarChar(36)
+  cliente_id String          @db.VarChar(36)
+  valor      Int             // em centavos
+  metodo     MetodoPagamento
+  status     StatusPagamento @default(PENDENTE)
+  criado_em  DateTime        @default(now()) @db.DateTime
+
+  transacoes Transacao[]
+
+  @@map("pagamento")
+}
+
+// ─── Transacao ──────────────────────────────────────────────────────────────────
+model Transacao {
+  id               String          @id @default(uuid()) @db.VarChar(36)
+  pagamento_id     String          @db.VarChar(36)
+  tipo             TipoTransacao
+  status           StatusTransacao @default(PENDENTE)
+  gateway_resposta String?         @db.Text
+  criado_em        DateTime        @default(now()) @db.DateTime
+
+  pagamento Pagamento @relation(fields: [pagamento_id], references: [id], onDelete: Cascade)
+
+  @@map("transacao")
+}
+
+// ─── Enums ──────────────────────────────────────────────────────────────────────
+enum MetodoPagamento {
+  PIX
+  CARTAO_CREDITO
+  CARTAO_DEBITO
+  DINHEIRO
+  VALE_REFEICAO
+}
+
+enum StatusPagamento {
+  PENDENTE
+  APROVADO
+  RECUSADO
+  ESTORNADO
+}
+
+enum TipoTransacao {
+  PAGAMENTO
+  ESTORNO
+}
+
+enum StatusTransacao {
+  PENDENTE
+  APROVADO
+  RECUSADO
+}

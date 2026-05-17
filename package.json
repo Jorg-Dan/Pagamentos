@@ -1,0 +1,26 @@
+{
+  "name": "ms-pagamentos",
+  "version": "1.0.0",
+  "description": "Microsserviço de pagamentos — NeloreBurguer",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@fastify/jwt": "^9.0.0",
+    "@prisma/client": "^7.8.0",
+    "axios": "^1.7.2",
+    "dotenv": "^17.4.2",
+    "fastify": "^4.28.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.22.3"
+  },
+  "devDependencies": {
+    "prisma": "^7.8.0"
+  }
+}
